@@ -18,7 +18,7 @@ class LaunchAPI extends RESTDataSource {
 	}
 
 	// write a launch reducer
-	launchReducer() {
+	launchReducer(launch) {
 		return {
 			id: launch.flight_number || 0,
 			cursor: `${launch.launch_date_unix}`,
@@ -31,7 +31,7 @@ class LaunchAPI extends RESTDataSource {
 			rocket: {
 				id: launch.rocket.rocket_id,
 				name: launch.rocket.rocket_name,
-				type: launch.rocker.rocket_type
+				type: launch.rocket.rocket_type
 			}
 		};
 	}
