@@ -18,11 +18,11 @@ export const typeDefs = gql`
     }
 `;
 
-export const schema = gql`
-  extend type Launch {
-    isInCart: Boolean!
-  }
-`;
+// export const schema = gql`
+//   extend type Launch {
+//     isInCart: Boolean!
+//   }
+// `;
 
 type ResolverFn = (
     parent: any,
@@ -36,10 +36,30 @@ interface ResolverMap {
 
 interface AppResolvers extends Resolvers {
     Launch: ResolverMap
+    Mutation: ResolverMap
     // We will update this with our app's resolvers later
 }
 
 export const resolvers: AppResolvers = {
+    Mutation: {
+        addOrRemoveFromCart: (_, { id }: { id: string }, { cache }): string[] => {
+            const queryResult = cache
+                .readQuery<GetCartItemTypes.GetCartItems, any>({
+                    query: GET_CART_ITEMS
+                });
+            if (queryResult) {
+                const { cartItems } = queryResult;
+                const data = {
+                    cartItems: cartItems.includes(id)
+                        ? cartItems.filter((i) => i !== id)
+                        : [...cartItems, id],
+                };
+                cache.writeQuery({ query: GET_CART_ITEMS, data });
+                return data.cartItems;
+            }
+            return [];
+        },
+    },
     Launch: {
         isInCart: (launch: LaunchTileTypes.LaunchTile, _, { cache }): boolean => {
             const queryResult = cache.readQuery<GetCartItemTypes.GetCartItems>({
