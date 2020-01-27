@@ -24,6 +24,9 @@ const server = new ApolloServer({
 	},
 	typeDefs,
 	resolvers,
+	engine: {
+		apiKey: 'service:codeninja-fsd:eNNCX8UrCSd0pe6KrLcG8A'
+	},
 	dataSources: () => ({
 		launchAPI: new LaunchAPI(),
 		userAPI: new UserAPI({ store })
