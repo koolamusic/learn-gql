@@ -2,28 +2,24 @@ const { paginateResults } = require('./utils');
 
 module.exports = {
 	Query: {
+		// launches: (_, __, { dataSources }) => dataSources.launchAPI.getAllLaunches(),
+		launch: (_, { id }, { dataSources }) => dataSources.launchAPI.getLaunchById({ launchId: id }),
+		me: (_, __, { dataSources }) => dataSources.userAPI.findOrCreateUser(),
 		launches: async (_, { pageSize = 20, after }, { dataSources }) => {
 			const allLaunches = await dataSources.launchAPI.getAllLaunches();
-			// we want the results in reverse chronological order so we call Array.reverse()
+			// we want these in reverse chronological order
 			allLaunches.reverse();
-			const launches = paginateResults({
-				after,
-				pageSize,
-				results: allLaunches
-			});
+			const launches = paginateResults({ after, pageSize, results: allLaunches });
 			return {
 				launches,
 				cursor: launches.length ? launches[launches.length - 1].cursor : null,
-				// if the cursor of the end of the paginated resultst is the same as the
-				// last item in _all_results, then there are no more results after this query
+				// if the cursor of the end of the paginated results is the same as the
+				// last item in _all_ results, then there are no more results after this
 				hasMore: launches.length
-					? launches[launches.length - 1].cursor !== allLaunches[allLaunches - 1].cursor
+					? launches[launches.length - 1].cursor !== allLaunches[allLaunches.length - 1].cursor
 					: false
 			};
-		},
-		// launches: (_, __, { dataSources }) => dataSources.launchAPI.getAllLaunches(),
-		launch: (_, { id }, { dataSources }) => dataSources.launchAPI.getLaunchById({ launchId: id }),
-		me: (_, __, { dataSources }) => dataSources.userAPI.findOrCreateUser()
+		}
 	}
 };
 
